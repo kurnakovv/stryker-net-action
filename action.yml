@@ -81,7 +81,7 @@ runs:
       shell: bash
 
     - name: Report source branch
-      if: ${{ inputs.report-source-branch == "true" }}
+      if: ${{ inputs.report-source-branch == 'true' }}
       run: |
         dotnet stryker \
           ${{ env.CONFIG_PATH_PARAM }} \
@@ -91,7 +91,7 @@ runs:
       shell: bash
 
     - name: Upload Stryker Report
-      if: ${{ inputs.upload-report == "true" }}
+      if: ${{ inputs.upload-report == 'true' }}
       id: artifact-upload-step
       uses: actions/upload-artifact@v4
       with:

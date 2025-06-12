@@ -1,5 +1,15 @@
 {
     "stryker-config": {
-        
+        "solution": "../StrykerTestProject.sln",
+        "project": "../WebApplication1.csproj",
+        "reporters": [
+            "json",
+            "html",
+            "markdown",
+            "dashboard"
+        ],
+        "project-info": {
+            "name": "github.com/kurnakovv/stryker-net-action"
+        }
     }
 }
