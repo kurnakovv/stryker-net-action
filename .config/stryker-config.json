@@ -1,7 +1,5 @@
 {
     "stryker-config": {
-        "solution": "tests/SimpleProjectForStryker/SimpleProjectForStryker.sln",
-        "project": "tests/SimpleProjectForStryker/WebApplication1",
         "reporters": [
             "json",
             "html",
