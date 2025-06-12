@@ -83,6 +83,7 @@ runs:
     - name: Report source branch
       if: ${{ inputs.report-source-branch == 'true' }}
       run: |
+        ls tests/SimpleProjectForStryker/WebApplication1
         dotnet stryker \
           ${{ env.CONFIG_PATH_PARAM }} \
           ${{ env.DASHBOARD_API_KEY_PARAM }} \
