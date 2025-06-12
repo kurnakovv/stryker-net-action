@@ -1,0 +1,13 @@
+{
+    "stryker-config": {
+        "reporters": [
+            "json",
+            "html",
+            "markdown",
+            "dashboard"
+        ],
+        "project-info": {
+            "name": "github.com/kurnakovv/stryker-net-action"
+        }
+    }
+}
