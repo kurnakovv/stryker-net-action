@@ -1,0 +1,102 @@
+name: "Stryker.NET GitHub action"
+author: "kurnakovv"
+description: "Stryker .NET (Stryker Mutator) GitHub action"
+branding:
+  icon: "bar-chart-2"
+  color: "orange"
+inputs:
+  config-path:
+    description: "File where your configuration is located, for example `.config/stryker-config.json`. More info here https://stryker-mutator.io/docs/stryker-net/configuration/"
+    required: false
+  dashboard-api-key:
+    description: "Stryker dashboard API key. More info here https://stryker-mutator.io/docs/General/dashboard/"
+    required: false
+  report-source-branch:
+    description: "Run stryker report in current source branch (for default branch this parameter is always true)"
+    required: false
+    default: "true"
+  report-source-branch-diff:
+    description: "Run Stryker report and compare default branch with current source branch"
+    required: false
+    default: "false"
+  upload-report:
+    description: "Upload your report to GitHub cloud https://github.com/actions/upload-artifact"
+    required: false
+    default: "true"
+runs:
+  using: "composite"
+  steps:
+    - name: Set global variables
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; \
+        then
+          echo "This is a pull request"
+
+          echo "Target branch is $PR_BASE_REF"
+          echo "TARGET_BRANCH=$PR_BASE_REF" >> $GITHUB_ENV
+          echo "SINCE_PARAM=--since:$PR_BASE_REF" >> $GITHUB_ENV
+
+          echo "Source branch is $PR_REF"
+          echo "SOURCE_BRANCH=$PR_REF" >> $GITHUB_ENV
+        else
+          echo "This is not a pull request"
+
+          if [[ "$REF_NAME" != "$DEFAULT_BRANCH" ]]; \
+          then
+            echo "Current branch is not a default branch ($REF_NAME != $DEFAULT_BRANCH)"
+
+            echo "Target branch is $DEFAULT_BRANCH"
+            echo "TARGET_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+            echo "SINCE_PARAM=--since:$DEFAULT_BRANCH" >> $GITHUB_ENV
+          else
+            echo "Current branch is default ($REF_NAME == $DEFAULT_BRANCH)"
+          fi
+
+          echo "Source branch is $REF_NAME"
+          echo "SOURCE_BRANCH=$REF_NAME" >> $GITHUB_ENV
+        fi
+
+        if [[ "$CONFIG_PATH" != "" ]]; \
+        then
+          echo "CONFIG_PATH_PARAM=--config-file $CONFIG_PATH" >> $GITHUB_ENV
+        fi
+
+        if [[ "$DASHBOARD_API_KEY" != "" ]]; \
+        then
+          echo "DASHBOARD_API_KEY_PARAM=--dashboard-api-key $DASHBOARD_API_KEY" >> $GITHUB_ENV
+        fi
+      env:
+        PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+        PR_REF: ${{ github.ref }}
+        DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        REF_NAME: ${{ github.ref_name }}
+        CONFIG_PATH: ${{ inputs.config-path }}
+        DASHBOARD_API_KEY: ${{ inputs.dashboard-api-key }}
+      shell: bash
+    
+    - name: Install Stryker.NET
+      run: |
+        dotnet tool install --global dotnet-stryker
+        dotnet tool restore
+      shell: bash
+
+    - name: Report source branch
+      if: ${{ inputs.report-source-branch == "true" }}
+      run: |
+        dotnet stryker \
+          ${{ env.CONFIG_PATH_PARAM }} \
+          ${{ env.DASHBOARD_API_KEY_PARAM }} \
+          --version ${{ env.SOURCE_BRANCH }} \
+          --output StrykerOutput
+      shell: bash
+
+    - name: Upload Stryker Report
+      if: ${{ inputs.upload-report == "true" }}
+      id: artifact-upload-step
+      uses: actions/upload-artifact@v4
+      with:
+        name: stryker-report
+        path: |
+          ${{github.workspace}}/StrykerOutput/**/**/*.html
+          ${{github.workspace}}/StrykerOutput/**/**/*.md
+          ${{github.workspace}}/StrykerOutput/**/**/*.json
