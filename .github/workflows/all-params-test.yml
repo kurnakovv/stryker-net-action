@@ -21,7 +21,7 @@ jobs:
       - name: Stryker.NET
         uses: ./
         with:
-          config-path: ".config/stryker-config.json"
+          config-path: "./.config/stryker-config.json"
           dashboard-api-key: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
           report-source-branch: "true"
           report-source-branch-diff: "false"
