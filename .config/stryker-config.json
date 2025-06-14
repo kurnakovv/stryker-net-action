@@ -4,7 +4,11 @@
             "json",
             "html",
             "markdown",
-            "dashboard"
+            "dashboard",
+            "progress",
+            "dots",
+            "cleartext",
+            "cleartexttree"
         ],
         "project-info": {
             "name": "github.com/kurnakovv/stryker-net-action"
