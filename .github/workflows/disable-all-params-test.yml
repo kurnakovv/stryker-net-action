@@ -1,0 +1,24 @@
+name: Test with all params disabled
+
+on: [push, pull_request]
+
+jobs:
+  stryker_net:
+    runs-on: ubuntu-latest
+    name: Stryker.NET GitHub action
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      
+      - name: Stryker.NET
+        uses: ./
+        with:
+          report-source-branch: "false"
+          report-source-branch-diff: "false"
+          upload-report: "false"
+          send-report-message: "false"
