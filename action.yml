@@ -23,6 +23,10 @@ inputs:
     description: "Upload your report to GitHub cloud https://github.com/actions/upload-artifact"
     required: false
     default: "true"
+  send-report-message:
+    description: "Send report message when you open PR (add `permissions.pull-requests: write` to your action https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token)"
+    required: false
+    default: "true"
 runs:
   using: "composite"
   steps:
@@ -65,6 +69,12 @@ runs:
         then
           echo "DASHBOARD_API_KEY_PARAM=--dashboard-api-key $DASHBOARD_API_KEY" >> $GITHUB_ENV
         fi
+
+        if [ ${{ github.event_name }} = 'pull_request' ]; then
+          echo "FULL_REPO_NAME=$PR_REPO_NAME" >>$GITHUB_ENV
+        else
+          echo "FULL_REPO_NAME=$GITHUB_REPOSITORY" >>$GITHUB_ENV
+        fi
       env:
         PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
         PR_REF: ${{ github.ref }}
@@ -72,6 +82,7 @@ runs:
         REF_NAME: ${{ github.ref_name }}
         CONFIG_PATH: ${{ inputs.config-path }}
         DASHBOARD_API_KEY: ${{ inputs.dashboard-api-key }}
+        PR_REPO_NAME: ${{ github.event.pull_request.head.repo.full_name }}
       shell: bash
     
     - name: Install Stryker.NET
@@ -100,3 +111,36 @@ runs:
           ${{github.workspace}}/StrykerOutput/**/**/*.html
           ${{github.workspace}}/StrykerOutput/**/**/*.md
           ${{github.workspace}}/StrykerOutput/**/**/*.json
+
+    - name: Add report message text
+      run: |
+        if [[ "$REPORT_SOURCE_BRANCH" != "" ]]; \
+        then
+          echo "REPORT_SOURCE_BRANCH_BADGE=[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}#mutant)" >> $GITHUB_ENV
+        else
+          echo "REPORT_SOURCE_BRANCH_BADGE=---" >> $GITHUB_ENV
+        fi
+
+        if [[ "$UPLOAD_REPORT" != "" ]]; \
+        then
+          echo "UPLOAD_REPORT_BADGE=[![Static Badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }}" >> $GITHUB_ENV
+        else
+          echo "UPLOAD_REPORT_BADGE=---" >> $GITHUB_ENV
+        fi
+      env:
+        REPORT_SOURCE_BRANCH: ${{ inputs.report-source-branch }}
+        UPLOAD_REPORT: ${{ inputs.upload-report }}
+      shell: bash
+
+    - name: Send report message
+      uses: mshick/add-pr-comment@v2
+      with:
+        message: |
+          # ![S](https://raw.githubusercontent.com/stryker-mutator/stryker-mutator.github.io/6026230eaa82a130950a859e523a703d7f30f291/static/images/stryker-80x80.png)tryker.NET <img src="https://raw.githubusercontent.com/jpb06/jpb06/master/icons/GithubActions-Dark.svg" width="80" />
+
+          | Description  | Badge |
+          | ------------ | ----- |
+          | `${{ env.SOURCE_BRANCH }}` (source branch) statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
+          | `${{ env.TARGET_BRANCH }}` (target branch) statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
+          | Download report from GitHub storage | ${{ env.UPLOAD_REPORT_BADGE }} |
+      if: "${{ github.event_name == 'pull_request' && inputs.send-report-message == 'true' }}"
