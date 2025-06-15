@@ -38,10 +38,16 @@ runs:
 
           echo "Target branch is $PR_BASE_REF"
           echo "TARGET_BRANCH=$PR_BASE_REF" >> $GITHUB_ENV
-          echo "SINCE_PARAM=--since:$PR_BASE_REF" >> $GITHUB_ENV
 
           echo "Source branch is $PR_REF"
           echo "SOURCE_BRANCH=$PR_REF" >> $GITHUB_ENV
+
+          if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
+          then
+            echo "SINCE_PARAM=--since:$PR_BASE_REF" >> $GITHUB_ENV
+          fi
+
+          echo "FULL_REPO_NAME=$PR_REPO_NAME" >>$GITHUB_ENV
         else
           echo "This is not a pull request"
 
@@ -51,13 +57,19 @@ runs:
 
             echo "Target branch is $DEFAULT_BRANCH"
             echo "TARGET_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
-            echo "SINCE_PARAM=--since:$DEFAULT_BRANCH" >> $GITHUB_ENV
+
+            if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
+            then
+              echo "SINCE_PARAM=--since:$DEFAULT_BRANCH" >> $GITHUB_ENV
+            fi
           else
             echo "Current branch is default ($REF_NAME == $DEFAULT_BRANCH)"
           fi
 
           echo "Source branch is $REF_NAME"
           echo "SOURCE_BRANCH=$REF_NAME" >> $GITHUB_ENV
+
+          echo "FULL_REPO_NAME=$GITHUB_REPOSITORY" >>$GITHUB_ENV
         fi
 
         if [[ "$CONFIG_PATH" != "" ]]; \
@@ -69,12 +81,6 @@ runs:
         then
           echo "DASHBOARD_API_KEY_PARAM=--dashboard-api-key $DASHBOARD_API_KEY" >> $GITHUB_ENV
         fi
-
-        if [ ${{ github.event_name }} = 'pull_request' ]; then
-          echo "FULL_REPO_NAME=$PR_REPO_NAME" >>$GITHUB_ENV
-        else
-          echo "FULL_REPO_NAME=$GITHUB_REPOSITORY" >>$GITHUB_ENV
-        fi
       env:
         PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
         PR_REF: ${{ github.ref }}
@@ -83,6 +89,7 @@ runs:
         CONFIG_PATH: ${{ inputs.config-path }}
         DASHBOARD_API_KEY: ${{ inputs.dashboard-api-key }}
         PR_REPO_NAME: ${{ github.event.pull_request.head.repo.full_name }}
+        REPORT_SOURCE_BRANCH_DIFF: ${{ inputs.report-source-branch-diff }}
       shell: bash
     
     - name: Install Stryker.NET
@@ -100,6 +107,16 @@ runs:
           --version ${{ env.SOURCE_BRANCH }} \
           --output StrykerOutput
       shell: bash
+
+    - name: Report stryker (diff)
+      if: "${{ github.ref_name != github.event.repository.default_branch && inputs.report-source-branch-diff == 'true' }}"
+      run: |
+        dotnet stryker \
+          ${{ env.CONFIG_PATH_PARAM }} \
+          ${{ env.SINCE_PARAM }} \
+          ${{ env.DASHBOARD_API_KEY_PARAM }} \
+          --version ${{ env.SOURCE_BRANCH }} \
+          --output StrykerOutputDiff
 
     - name: Upload Stryker Report
       if: ${{ inputs.upload-report == 'true' }}
@@ -121,6 +138,13 @@ runs:
           echo "REPORT_SOURCE_BRANCH_BADGE=---" >> $GITHUB_ENV
         fi
 
+        if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
+        then
+          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}#mutant)" >> $GITHUB_ENV
+        else
+          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=---" >> $GITHUB_ENV
+        fi
+
         if [[ "$UPLOAD_REPORT" == "true" ]]; \
         then
           echo "UPLOAD_REPORT_BADGE=[![Static Badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }})" >> $GITHUB_ENV
@@ -129,6 +153,7 @@ runs:
         fi
       env:
         REPORT_SOURCE_BRANCH: ${{ inputs.report-source-branch }}
+        REPORT_SOURCE_BRANCH_DIFF: ${{ inputs.report-source-branch-diff }}
         UPLOAD_REPORT: ${{ inputs.upload-report }}
       shell: bash
 
@@ -140,6 +165,7 @@ runs:
 
           | Description  | Badge |
           | ------------ | ----- |
+          | Diff between `${{ env.TARGET_BRANCH }}` (target branch) and `${{ env.SOURCE_BRANCH }}` (source branch) | ${{ env.REPORT_SOURCE_BRANCH_DIFF_BADGE }} |
           | `${{ env.SOURCE_BRANCH }}` (source branch) statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
           | `${{ env.TARGET_BRANCH }}` (target branch) statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
           | Download report from GitHub storage | ${{ env.UPLOAD_REPORT_BADGE }} |
