@@ -130,6 +130,10 @@ runs:
           ${{github.workspace}}/StrykerOutput/**/**/*.md
           ${{github.workspace}}/StrykerOutput/**/**/*.json
 
+          ${{github.workspace}}/StrykerOutputDiff/**/**/*.html
+          ${{github.workspace}}/StrykerOutputDiff/**/**/*.md
+          ${{github.workspace}}/StrykerOutputDiff/**/**/*.json
+
     - name: Add report message text
       run: |
         if [[ "$REPORT_SOURCE_BRANCH" == "true" ]]; \
