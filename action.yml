@@ -6,10 +6,10 @@ branding:
   color: "orange"
 inputs:
   config-path:
-    description: "File where your configuration is located, for example `.config/stryker-config.json`. More info here https://stryker-mutator.io/docs/stryker-net/configuration/"
+    description: "File path where configuration is located, for example `.config/stryker-config.json`. More info here https://stryker-mutator.io/docs/stryker-net/configuration"
     required: false
   dashboard-api-key:
-    description: "Stryker dashboard API key. More info here https://stryker-mutator.io/docs/General/dashboard/"
+    description: "Stryker dashboard API key. More info here https://stryker-mutator.io/docs/General/dashboard"
     required: false
   report-source-branch:
     description: "Run stryker report in current source branch (for default branch this parameter is always true)"
@@ -20,11 +20,11 @@ inputs:
     required: false
     default: "false"
   upload-report:
-    description: "Upload your report to GitHub cloud https://github.com/actions/upload-artifact"
+    description: "Upload report to GitHub cloud https://github.com/actions/upload-artifact"
     required: false
     default: "true"
   send-report-message:
-    description: "Send report message when you open PR (add `permissions.pull-requests: write` to your action https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token)"
+    description: "Send report message when PR is opened (add `permissions.pull-requests: write` to action https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token)"
     required: false
     default: "true"
 runs:
@@ -145,14 +145,14 @@ runs:
 
         if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
         then
-          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff)](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff#mutant)" >> $GITHUB_ENV
+          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=[![Mutation testing diff badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff)](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff#mutant)" >> $GITHUB_ENV
         else
           echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=---" >> $GITHUB_ENV
         fi
 
         if [[ "$UPLOAD_REPORT" == "true" ]]; \
         then
-          echo "UPLOAD_REPORT_BADGE=[![Static Badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }})" >> $GITHUB_ENV
+          echo "UPLOAD_REPORT_BADGE=[![Upload report badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }})" >> $GITHUB_ENV
         else
           echo "UPLOAD_REPORT_BADGE=---" >> $GITHUB_ENV
         fi
@@ -170,8 +170,8 @@ runs:
 
           | Description  | Badge |
           | ------------ | ----- |
-          | Diff between `${{ env.TARGET_BRANCH }}` (target branch) and `${{ env.SOURCE_BRANCH }}` (source branch) | ${{ env.REPORT_SOURCE_BRANCH_DIFF_BADGE }} |
-          | `${{ env.SOURCE_BRANCH }}` (source branch) statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
-          | `${{ env.TARGET_BRANCH }}` (target branch) statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
+          | Diff between target branch [`${{ env.TARGET_BRANCH }}`] and source branch [`${{ env.SOURCE_BRANCH }}`] | ${{ env.REPORT_SOURCE_BRANCH_DIFF_BADGE }} |
+          | Source branch [`${{ env.SOURCE_BRANCH }}`] statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
+          | Target branch [`${{ env.TARGET_BRANCH }}`] statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
           | Download report from GitHub storage | ${{ env.UPLOAD_REPORT_BADGE }} |
       if: "${{ github.event_name == 'pull_request' && inputs.send-report-message == 'true' }}"
