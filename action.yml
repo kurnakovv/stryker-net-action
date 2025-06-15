@@ -98,11 +98,16 @@ runs:
     #     dotnet tool restore
     #   shell: bash
     
-    - name: Install dotnet-stryker
+    # - name: Install dotnet-stryker
+    #   run: |
+    #     dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools || dotnet tool install --global dotnet-stryker
+    #     dotnet tool restore
+    #   shell: bash
+
+    - name: Install dotnet-stryker (local or global)
       run: |
-        dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools
-        dotnet tool restore
-      shell: bash
+        dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools || \
+        (dotnet tool install --global dotnet-stryker && echo "$HOME/.dotnet/tools" >> $GITHUB_PATH)
 
     - name: Report source branch
       if: ${{ inputs.report-source-branch == 'true' }}
