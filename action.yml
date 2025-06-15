@@ -123,7 +123,7 @@ runs:
 
         if [[ "$UPLOAD_REPORT" != "" ]]; \
         then
-          echo "UPLOAD_REPORT_BADGE=[![Static Badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }}" >> $GITHUB_ENV
+          echo "UPLOAD_REPORT_BADGE=[![Static Badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }})" >> $GITHUB_ENV
         else
           echo "UPLOAD_REPORT_BADGE=---" >> $GITHUB_ENV
         fi
