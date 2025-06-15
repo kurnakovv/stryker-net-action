@@ -170,8 +170,8 @@ runs:
 
           | Description  | Badge |
           | ------------ | ----- |
-          | Diff between target branch (`${{ env.TARGET_BRANCH }}`) and source branch (`${{ env.SOURCE_BRANCH }}`) | ${{ env.REPORT_SOURCE_BRANCH_DIFF_BADGE }} |
-          | Source branch `${{ env.SOURCE_BRANCH }}` statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
-          | Target branch `${{ env.TARGET_BRANCH }}` statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
+          | Diff between target branch [`${{ env.TARGET_BRANCH }}`] and source branch [`${{ env.SOURCE_BRANCH }}`] | ${{ env.REPORT_SOURCE_BRANCH_DIFF_BADGE }} |
+          | Source branch [`${{ env.SOURCE_BRANCH }}`] statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
+          | Target branch [`${{ env.TARGET_BRANCH }}`] statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
           | Download report from GitHub storage | ${{ env.UPLOAD_REPORT_BADGE }} |
       if: "${{ github.event_name == 'pull_request' && inputs.send-report-message == 'true' }}"
