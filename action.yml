@@ -92,10 +92,14 @@ runs:
         REPORT_SOURCE_BRANCH_DIFF: ${{ inputs.report-source-branch-diff }}
       shell: bash
     
-    - name: Install Stryker.NET
-      run: |
-        dotnet tool install --global dotnet-stryker
-        dotnet tool restore
+    # - name: Install Stryker.NET
+    #   run: |
+    #     dotnet tool install --global dotnet-stryker
+    #     dotnet tool restore
+    #   shell: bash
+    
+    - name: Install dotnet-stryker
+      run: dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools
       shell: bash
 
     - name: Report source branch
