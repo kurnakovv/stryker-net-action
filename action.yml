@@ -143,4 +143,4 @@ runs:
           | `${{ env.SOURCE_BRANCH }}` (source branch) statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
           | `${{ env.TARGET_BRANCH }}` (target branch) statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
           | Download report from GitHub storage | ${{ env.UPLOAD_REPORT_BADGE }} |
-      if: "${{ github.event_name == 'pull_request' && inputs.send-report-message == 'true' }}"
+      # if: "${{ github.event_name == 'pull_request' && inputs.send-report-message == 'true' }}"
