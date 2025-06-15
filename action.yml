@@ -117,6 +117,7 @@ runs:
           ${{ env.DASHBOARD_API_KEY_PARAM }} \
           --version ${{ env.SOURCE_BRANCH }} \
           --output StrykerOutputDiff
+      shell: bash
 
     - name: Upload Stryker Report
       if: ${{ inputs.upload-report == 'true' }}
