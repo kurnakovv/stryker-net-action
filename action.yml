@@ -114,14 +114,14 @@ runs:
 
     - name: Add report message text
       run: |
-        if [[ "$REPORT_SOURCE_BRANCH" != "" ]]; \
+        if [[ "$REPORT_SOURCE_BRANCH" == "true" ]]; \
         then
           echo "REPORT_SOURCE_BRANCH_BADGE=[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}#mutant)" >> $GITHUB_ENV
         else
           echo "REPORT_SOURCE_BRANCH_BADGE=---" >> $GITHUB_ENV
         fi
 
-        if [[ "$UPLOAD_REPORT" != "" ]]; \
+        if [[ "$UPLOAD_REPORT" == "true" ]]; \
         then
           echo "UPLOAD_REPORT_BADGE=[![Static Badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }})" >> $GITHUB_ENV
         else
