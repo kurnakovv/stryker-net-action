@@ -145,7 +145,7 @@ runs:
 
         if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
         then
-          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}#mutant)" >> $GITHUB_ENV
+          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff)](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff#mutant)" >> $GITHUB_ENV
         else
           echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=---" >> $GITHUB_ENV
         fi
