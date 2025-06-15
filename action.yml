@@ -108,6 +108,8 @@ runs:
       run: |
         dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools || \
         (dotnet tool install --global dotnet-stryker && echo "$HOME/.dotnet/tools" >> $GITHUB_PATH)
+
+        dotnet tool restore
       shell: bash
 
     - name: Report source branch
