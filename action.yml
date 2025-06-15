@@ -99,7 +99,9 @@ runs:
     #   shell: bash
     
     - name: Install dotnet-stryker
-      run: dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools
+      run: |
+        dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools
+        dotnet tool restore
       shell: bash
 
     - name: Report source branch
