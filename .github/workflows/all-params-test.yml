@@ -1,3 +1,5 @@
+name: Test with all params
+
 on: [push, pull_request]
 
 jobs:
