@@ -115,7 +115,7 @@ runs:
           ${{ env.CONFIG_PATH_PARAM }} \
           ${{ env.SINCE_PARAM }} \
           ${{ env.DASHBOARD_API_KEY_PARAM }} \
-          --version ${{ env.SOURCE_BRANCH }} \
+          --version ${{ env.SOURCE_BRANCH }}-diff \
           --output StrykerOutputDiff
       shell: bash
 
