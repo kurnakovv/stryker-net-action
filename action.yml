@@ -91,11 +91,19 @@ runs:
         PR_REPO_NAME: ${{ github.event.pull_request.head.repo.full_name }}
         REPORT_SOURCE_BRANCH_DIFF: ${{ inputs.report-source-branch-diff }}
       shell: bash
-    
-    - name: Install Stryker.NET
+
+    - name: Install dotnet-stryker (restore or install)
       run: |
-        dotnet tool install --global dotnet-stryker
         dotnet tool restore
+
+        if dotnet tool list --local | grep -q dotnet-stryker ; then
+          echo "✅ Required tool 'dotnet-stryker' was restored"
+        else
+          echo "⚠️ Required tool 'dotnet-stryker' was not restored. Installing the latest version..."
+          echo "💡 To optimize this step, install dotnet-stryker via manifest https://stryker-mutator.io/docs/stryker-net/getting-started/#install-in-project"
+
+          dotnet tool install dotnet-stryker --global
+        fi
       shell: bash
 
     - name: Report source branch
