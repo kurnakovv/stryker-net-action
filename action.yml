@@ -119,13 +119,6 @@ runs:
 
     - name: Install dotnet-stryker (local or global)
       run: |
-        if dotnet tool install dotnet-stryker ; then
-          echo "Install local stryker succeeded"
-        else
-          dotnet tool install --global dotnet-stryker
-          echo "Install global stryker succeeded"
-        fi
-
         dotnet tool restore
       shell: bash
 
