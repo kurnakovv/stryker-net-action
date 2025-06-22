@@ -102,7 +102,7 @@ runs:
           echo "Required tool 'dotnet-stryker' was not restored. Installing the latest version..."
           echo "To optimize this step, install dotnet-stryker via manifest https://stryker-mutator.io/docs/stryker-net/getting-started/#install-in-project"
 
-          dotnet tool install dotnet-stryker
+          dotnet tool install dotnet-stryker --global
           dotnet tool restore
         fi
       shell: bash
