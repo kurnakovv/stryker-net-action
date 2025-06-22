@@ -119,14 +119,11 @@ runs:
 
     - name: Install dotnet-stryker (local or global)
       run: |
-        ls ${{ github.workspace }}/tools
-        dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools
-
-        if dotnet tool list dotnet-stryker --tool-path ${{ github.workspace }}/tools; exit $? ; then
+        if dotnet tool install dotnet-stryker ; then
+          echo "Install local stryker succeeded"
+        else
           dotnet tool install --global dotnet-stryker
           echo "Install global stryker succeeded"
-        else
-          echo "Install local stryker succeeded"
         fi
 
         dotnet tool restore
