@@ -96,11 +96,11 @@ runs:
       run: |
         dotnet tool restore
 
-        if dotnet tool list --local | grep dotnet-stryker ; then
-          echo "Required tool 'dotnet-stryker' was restored"
+        if dotnet tool list --local | grep -q dotnet-stryker ; then
+          echo "✅ Required tool 'dotnet-stryker' was restored"
         else
-          echo "Required tool 'dotnet-stryker' was not restored. Installing the latest version..."
-          echo "To optimize this step, install dotnet-stryker via manifest https://stryker-mutator.io/docs/stryker-net/getting-started/#install-in-project"
+          echo "⚠️ Required tool 'dotnet-stryker' was not restored. Installing the latest version..."
+          echo "💡 To optimize this step, install dotnet-stryker via manifest https://stryker-mutator.io/docs/stryker-net/getting-started/#install-in-project"
 
           dotnet tool install dotnet-stryker --global
         fi
