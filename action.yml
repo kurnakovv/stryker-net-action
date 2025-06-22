@@ -120,13 +120,15 @@ runs:
     - name: Install dotnet-stryker (restore or install)
       run: |
         dotnet tool restore
-        dotnet tool list --local | grep dotnet-stryker > /dev/null
-        if [ $? -ne 0 ]; then
-            echo "Required tool 'dotnet-stryker' was not restored. Install last version"
-            echo "To optimize this step, install dotnet-stryker via manifest https://stryker-mutator.io/docs/stryker-net/getting-started/#install-in-project"
-            
-            dotnet tool install dotnet-stryker
-            dotnet tool restore
+
+        if dotnet tool list --local | grep dotnet-stryker ; then
+          echo "Required tool 'dotnet-stryker' was not restored. Install last version"
+          echo "To optimize this step, install dotnet-stryker via manifest https://stryker-mutator.io/docs/stryker-net/getting-started/#install-in-project"
+
+          dotnet tool install dotnet-stryker
+          dotnet tool restore
+        else
+          echo "Required tool 'dotnet-stryker' was restored"
         fi
       shell: bash
 
