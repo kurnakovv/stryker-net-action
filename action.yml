@@ -91,31 +91,6 @@ runs:
         PR_REPO_NAME: ${{ github.event.pull_request.head.repo.full_name }}
         REPORT_SOURCE_BRANCH_DIFF: ${{ inputs.report-source-branch-diff }}
       shell: bash
-    
-    # - name: Install Stryker.NET
-    #   run: |
-    #     dotnet tool install --global dotnet-stryker
-    #     dotnet tool restore
-    #   shell: bash
-    
-    # - name: Install dotnet-stryker
-    #   run: |
-    #     dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools || dotnet tool install --global dotnet-stryker
-    #     dotnet tool restore
-    #   shell: bash
-
-    # - name: Install dotnet-stryker (local or global)
-    #   run: |
-    #     cat ${{ github.workspace }}/tools
-    #     if dotnet tool install dotnet-stryker --tool-path ${{ github.workspace }}/tools ; then
-    #       echo "Install local stryker succeeded"
-    #     else
-    #       dotnet tool install --global dotnet-stryker
-    #       echo "Install global stryker succeeded"
-    #     fi
-
-    #     dotnet tool restore
-    #   shell: bash
 
     - name: Install dotnet-stryker (restore or install)
       run: |
