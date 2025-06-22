@@ -174,7 +174,7 @@ runs:
       uses: mshick/add-pr-comment@v2
       with:
         message: |
-          # ![S](https://raw.githubusercontent.com/stryker-mutator/stryker-mutator.github.io/6026230eaa82a130950a859e523a703d7f30f291/static/images/stryker-80x80.png)tryker.NET <img src="https://raw.githubusercontent.com/jpb06/jpb06/master/icons/GithubActions-Dark.svg" width="80" />
+          # [![S](https://raw.githubusercontent.com/stryker-mutator/stryker-mutator.github.io/6026230eaa82a130950a859e523a703d7f30f291/static/images/stryker-80x80.png)](https://github.com/stryker-mutator/stryker-net)tryker.NET <a href="https://github.com/kurnakovv/stryker-net-action"><img src="https://raw.githubusercontent.com/jpb06/jpb06/master/icons/GithubActions-Dark.svg" width="80" /></a>
 
           | Description  | Badge |
           | ------------ | ----- |
