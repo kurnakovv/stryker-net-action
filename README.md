@@ -11,7 +11,7 @@
 
 This is a GitHub action that runs the [Stryker.NET](https://stryker-mutator.io/docs/stryker-net/introduction/) tool 👽
 
-# Features
+# 💡 Features
 * 🏡 Generate a report for source branch
 * 💾 Download the report
 * 📊 Upload the report to the dashboard
