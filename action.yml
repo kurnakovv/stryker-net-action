@@ -1,0 +1,185 @@
+name: "Stryker.NET GitHub action"
+author: "kurnakovv"
+description: "Stryker .NET (Stryker Mutator) GitHub action 👽"
+branding:
+  icon: "bar-chart-2"
+  color: "orange"
+inputs:
+  config-path:
+    description: "File path where configuration is located, for example `.config/stryker-config.json`. More info here https://stryker-mutator.io/docs/stryker-net/configuration"
+    required: false
+  dashboard-api-key:
+    description: "Stryker dashboard API key. More info here https://stryker-mutator.io/docs/General/dashboard"
+    required: false
+  report-source-branch:
+    description: "Run stryker report in current source branch (for default branch this parameter is always true)"
+    required: false
+    default: "true"
+  report-source-branch-diff:
+    description: "Run Stryker report and compare default branch with current source branch"
+    required: false
+    default: "false"
+  upload-report:
+    description: "Upload report to GitHub cloud https://github.com/actions/upload-artifact"
+    required: false
+    default: "true"
+  send-report-message:
+    description: "Send report message when PR is opened (add `permissions.pull-requests: write` to action https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token)"
+    required: false
+    default: "true"
+runs:
+  using: "composite"
+  steps:
+    - name: Set global variables
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; \
+        then
+          echo "This is a pull request"
+
+          echo "Target branch is $PR_BASE_REF"
+          echo "TARGET_BRANCH=$PR_BASE_REF" >> $GITHUB_ENV
+
+          echo "Source branch is $PR_REF"
+          echo "SOURCE_BRANCH=$PR_REF" >> $GITHUB_ENV
+
+          if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
+          then
+            echo "SINCE_PARAM=--since:$PR_BASE_REF" >> $GITHUB_ENV
+          fi
+
+          echo "FULL_REPO_NAME=$PR_REPO_NAME" >>$GITHUB_ENV
+        else
+          echo "This is not a pull request"
+
+          if [[ "$REF_NAME" != "$DEFAULT_BRANCH" ]]; \
+          then
+            echo "Current branch is not a default branch ($REF_NAME != $DEFAULT_BRANCH)"
+
+            echo "Target branch is $DEFAULT_BRANCH"
+            echo "TARGET_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+
+            if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
+            then
+              echo "SINCE_PARAM=--since:$DEFAULT_BRANCH" >> $GITHUB_ENV
+            fi
+          else
+            echo "Current branch is default ($REF_NAME == $DEFAULT_BRANCH)"
+          fi
+
+          echo "Source branch is $REF_NAME"
+          echo "SOURCE_BRANCH=$REF_NAME" >> $GITHUB_ENV
+
+          echo "FULL_REPO_NAME=$GITHUB_REPOSITORY" >>$GITHUB_ENV
+        fi
+
+        if [[ "$CONFIG_PATH" != "" ]]; \
+        then
+          echo "CONFIG_PATH_PARAM=--config-file $CONFIG_PATH" >> $GITHUB_ENV
+        fi
+
+        if [[ "$DASHBOARD_API_KEY" != "" ]]; \
+        then
+          echo "DASHBOARD_API_KEY_PARAM=--dashboard-api-key $DASHBOARD_API_KEY" >> $GITHUB_ENV
+        fi
+      env:
+        PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+        PR_REF: ${{ github.ref }}
+        DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        REF_NAME: ${{ github.ref_name }}
+        CONFIG_PATH: ${{ inputs.config-path }}
+        DASHBOARD_API_KEY: ${{ inputs.dashboard-api-key }}
+        PR_REPO_NAME: ${{ github.event.pull_request.head.repo.full_name }}
+        REPORT_SOURCE_BRANCH_DIFF: ${{ inputs.report-source-branch-diff }}
+      shell: bash
+
+    - name: Install dotnet-stryker (restore or install)
+      run: |
+        dotnet tool restore
+
+        if dotnet tool list --local | grep -q dotnet-stryker ; then
+          echo "✅ Required tool 'dotnet-stryker' was restored"
+        else
+          echo "⚠️ Required tool 'dotnet-stryker' was not restored. Installing the latest version..."
+          echo "💡 To optimize this step, install dotnet-stryker via manifest https://stryker-mutator.io/docs/stryker-net/getting-started/#install-in-project"
+
+          dotnet tool install dotnet-stryker --global
+        fi
+      shell: bash
+
+    - name: Report source branch
+      if: ${{ inputs.report-source-branch == 'true' }}
+      run: |
+        dotnet stryker \
+          ${{ env.CONFIG_PATH_PARAM }} \
+          ${{ env.DASHBOARD_API_KEY_PARAM }} \
+          --version ${{ env.SOURCE_BRANCH }} \
+          --output StrykerOutput
+      shell: bash
+
+    - name: Report stryker (diff)
+      if: "${{ github.ref_name != github.event.repository.default_branch && inputs.report-source-branch-diff == 'true' }}"
+      run: |
+        dotnet stryker \
+          ${{ env.CONFIG_PATH_PARAM }} \
+          ${{ env.SINCE_PARAM }} \
+          ${{ env.DASHBOARD_API_KEY_PARAM }} \
+          --version ${{ env.SOURCE_BRANCH }}-diff \
+          --output StrykerOutputDiff
+      shell: bash
+
+    - name: Upload Stryker Report
+      if: ${{ inputs.upload-report == 'true' }}
+      id: artifact-upload-step
+      uses: actions/upload-artifact@v4
+      with:
+        name: stryker-report
+        path: |
+          ${{github.workspace}}/StrykerOutput/**/**/*.html
+          ${{github.workspace}}/StrykerOutput/**/**/*.md
+          ${{github.workspace}}/StrykerOutput/**/**/*.json
+
+          ${{github.workspace}}/StrykerOutputDiff/**/**/*.html
+          ${{github.workspace}}/StrykerOutputDiff/**/**/*.md
+          ${{github.workspace}}/StrykerOutputDiff/**/**/*.json
+
+    - name: Add report message text
+      run: |
+        if [[ "$REPORT_SOURCE_BRANCH" == "true" ]]; \
+        then
+          echo "REPORT_SOURCE_BRANCH_BADGE=[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}#mutant)" >> $GITHUB_ENV
+        else
+          echo "REPORT_SOURCE_BRANCH_BADGE=---" >> $GITHUB_ENV
+        fi
+
+        if [[ "$REPORT_SOURCE_BRANCH_DIFF" == "true" ]]; \
+        then
+          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=[![Mutation testing diff badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff)](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.SOURCE_BRANCH }}-diff#mutant)" >> $GITHUB_ENV
+        else
+          echo "REPORT_SOURCE_BRANCH_DIFF_BADGE=---" >> $GITHUB_ENV
+        fi
+
+        if [[ "$UPLOAD_REPORT" == "true" ]]; \
+        then
+          echo "UPLOAD_REPORT_BADGE=[![Upload report badge](https://img.shields.io/badge/download-report-blue)](${{ steps.artifact-upload-step.outputs.artifact-url }})" >> $GITHUB_ENV
+        else
+          echo "UPLOAD_REPORT_BADGE=---" >> $GITHUB_ENV
+        fi
+      env:
+        REPORT_SOURCE_BRANCH: ${{ inputs.report-source-branch }}
+        REPORT_SOURCE_BRANCH_DIFF: ${{ inputs.report-source-branch-diff }}
+        UPLOAD_REPORT: ${{ inputs.upload-report }}
+      shell: bash
+
+    - name: Send report message
+      uses: mshick/add-pr-comment@v2
+      with:
+        message: |
+          # [![S](https://raw.githubusercontent.com/stryker-mutator/stryker-mutator.github.io/6026230eaa82a130950a859e523a703d7f30f291/static/images/stryker-80x80.png)](https://github.com/stryker-mutator/stryker-net)tryker.NET <a href="https://github.com/kurnakovv/stryker-net-action"><img src="https://raw.githubusercontent.com/jpb06/jpb06/master/icons/GithubActions-Dark.svg" width="80" /></a>
+
+          | Description  | Badge |
+          | ------------ | ----- |
+          | 🆚 Diff between target branch [`${{ env.TARGET_BRANCH }}`] and source branch [`${{ env.SOURCE_BRANCH }}`] | ${{ env.REPORT_SOURCE_BRANCH_DIFF_BADGE }} |
+          | 🏘 Source branch [`${{ env.SOURCE_BRANCH }}`] statistics | ${{ env.REPORT_SOURCE_BRANCH_BADGE }} |
+          | 🎯 Target branch [`${{ env.TARGET_BRANCH }}`] statistics | [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https://badge-api.stryker-mutator.io/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }})](https://dashboard.stryker-mutator.io/reports/github.com/${{ env.FULL_REPO_NAME }}/${{ env.TARGET_BRANCH }}#mutant) |
+          | 💾 Download report from GitHub storage | ${{ env.UPLOAD_REPORT_BADGE }} |
+      if: "${{ github.event_name == 'pull_request' && inputs.send-report-message == 'true' }}"
