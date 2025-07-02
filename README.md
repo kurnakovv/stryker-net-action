@@ -9,7 +9,7 @@
 
 </div>
 
-This is a GitHub action that runs the [Stryker.NET](https://stryker-mutator.io/docs/stryker-net/introduction/) tool
+This is a GitHub action that runs the [Stryker.NET](https://stryker-mutator.io/docs/stryker-net/introduction/) tool 👽
 
 # Features
 * 🏡 Generate a report for source branch
