@@ -1,4 +1,4 @@
-name: Stryker.NET mutation testing
+name: Stryker.NET mutation testing (latest version)
 
 on: [push, pull_request]
 
