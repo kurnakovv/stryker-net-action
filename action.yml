@@ -1,6 +1,6 @@
 name: "Stryker.NET GitHub action"
 author: "kurnakovv"
-description: "Stryker .NET (Stryker Mutator) GitHub action"
+description: "Stryker .NET (Stryker Mutator) GitHub action 👽"
 branding:
   icon: "bar-chart-2"
   color: "orange"
