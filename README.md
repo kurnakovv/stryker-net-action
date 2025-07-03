@@ -17,7 +17,7 @@ This is a GitHub action that runs the [Stryker.NET](https://stryker-mutator.io/d
 * 💾 Download the report
 * 📊 Upload the report to the dashboard
 * 📩 Send a report message when PR is opened
-* 🆚 Compare a source and target branches
+* 🆚 Compare source and target branches
 
 # 🚀 Quick start
 
@@ -105,11 +105,11 @@ Once the pipeline completes successfully, you'll see something like this:
 > if you are missing some configurations, you can add them to your configuration file `.config/stryker-config.json` | [docs](https://stryker-mutator.io/docs/stryker-net/configuration/)
 
 # ❔ Why
-* The official [docs](https://stryker-mutator.io/docs/stryker-net/stryker-in-pipeline/) uses the Azure DevOps syntax, not GitHub Action
-* The official [repository](https://github.com/stryker-mutator/github-action) doesn't work properly and has limited functionality. As the author stated [source](https://github.com/stryker-mutator/github-action/issues/23#issuecomment-2553581342):
+* The official [docs](https://stryker-mutator.io/docs/stryker-net/stryker-in-pipeline/) use Azure DevOps syntax, not GitHub Action
+* The official [repository](https://github.com/stryker-mutator/github-action) doesn't work properly and has limited functionality. As the author stated ([source](https://github.com/stryker-mutator/github-action/issues/23#issuecomment-2553581342)):
   > This project is a proof of concept created during a hackfest, there is no active maintainer for this project at this time
 * The unofficial [repository](https://github.com/Pub-Dev/stryker-net-action) contains no code and hasn't been updated in over 3 years
-* You can also use the source code, but it is too large to duplicate it in each repository, which violates the DRY principle
+* You can use the source code, but it is too large to duplicate it in each repository, which violates the DRY principle
 
 That's **why** I decided to create this action 🔥
 
