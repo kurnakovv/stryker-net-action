@@ -36,7 +36,7 @@ Or just create an empty file `.config/stryker-config.json`
         "reporters": [
             "html",
             "dashboard",
-            "progress",
+            "progress"
         ],
         "project-info": {
             "name": "github.com/OWNER/YOUR_REPOSITORY_NAME"
@@ -99,7 +99,7 @@ Once the pipeline completes successfully, you'll see something like this:
 | report-source-branch | with | Run stryker report in current source branch (for default branch this parameter is always true) | false | true |
 | report-source-branch-diff | with | Run Stryker report and compare default branch with current source branch. I do not recommend using it, as it works with bugs, this feature is waiting for a fix in this [issue](https://github.com/stryker-mutator/stryker-net/issues/3234) | false | false |
 | upload-report | with | Upload report to GitHub cloud / [what's under the hood?](https://github.com/marketplace/actions/upload-a-build-artifact) | false | true |
-| send-report-message | with | Send report message when PR is opened (add `permissions.pull-requests: write` to action / [how?](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token)) / [what's under the hood?](https://github.com/marketplace/actions/add-pr-comment) | false | --- |
+| send-report-message | with | Send report message when PR is opened (add `permissions.pull-requests: write` to action / [how?](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token)) / [what's under the hood?](https://github.com/marketplace/actions/add-pr-comment) | false | true |
 
 > [!NOTE]
 > if you are missing some configurations, you can add them to your configuration file `.config/stryker-config.json` | [docs](https://stryker-mutator.io/docs/stryker-net/configuration/)
